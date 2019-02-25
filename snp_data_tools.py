@@ -29,12 +29,17 @@ class SNP():
             chromosome = splitrow[1].strip('\"')
             position = splitrow[2].strip('\"')
             splitrow[3] = splitrow[3].strip('\"')
-            if len(splitrow[3]) == 2:
-                allele1 = splitrow[3][0]
-                allele2 = splitrow[3][1]
-            else:
+            if len(splitrow) == 5:
                 allele1 = splitrow[3]
                 allele2 = splitrow[4]
+            else:
+                if len(splitrow[3]) == 2:
+                    allele1 = splitrow[3][0]
+                    allele2 = splitrow[3][1]
+                else:
+                    allele1 = splitrow[3][0]
+                    allele2 = ""
+
             return SNP(rsid, chromosome, position, allele1, allele2)
 
     def __str__(self):
@@ -56,6 +61,9 @@ class SNPArray():
     def __iter__(self):
         return self
 
+    def __repr__(self):
+        return "{}".format(self.snps)
+
     @staticmethod
     def make_snp_file(snp_file):
         snps_array = []
@@ -63,6 +71,3 @@ class SNPArray():
             snps_array = [SNP.convert(row)for row in infile if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
 
             return SNPArray(snps_array)
-
-    def __repr__(self):
-        return "{}".format(self.snps)
