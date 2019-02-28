@@ -28,6 +28,7 @@ class SNPTests(unittest.TestCase):
         self.assertEqual(snp_data(snp), expected)
 
 
+
 class zip_file_Tests(unittest.TestCase):
     pass
 
@@ -45,6 +46,12 @@ class SNPArrayTests(unittest.TestCase):
         snp_array = SNPArray.make_snp_file("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt")
         expected = ("i702862", "MT", "16312", "A", "")
         self.assertEqual(snp_data(snp_array[5]), expected)
+
+    def test_genome_version_in_metadata(self):
+        """Test pulling out genome version from file metadata"""
+        genome_version = SNPArray.get_genome_version("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt")
+        expected = '37'
+        self.assertEqual(genome_version, expected)
 
 
 if __name__ == "__main__":

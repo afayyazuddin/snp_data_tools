@@ -71,3 +71,14 @@ class SNPArray():
         with open(snp_file, 'r') as infile:
             snps_array = [SNP.convert(row)for row in infile if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
             return SNPArray(snps_array)
+
+    @staticmethod
+    def get_genome_version(snp_file):
+        with open(snp_file, 'r') as infile:
+            # check for genome build in the first 25 lines
+            for x in range(25):
+                row = next(infile)
+                result = re.search('(?<=build )(..)', row)
+                if result is not None:
+                    break
+        return result.group(1)
