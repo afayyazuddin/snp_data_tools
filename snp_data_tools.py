@@ -2,7 +2,8 @@ import re
 '''import magic
 import os
 import zipfile
-import gzip'''
+import gzip
+import MySQLdb'''
 
 
 class zip_file():
@@ -52,9 +53,9 @@ class SNP():
 class SNPArray():
     def __init__(self, snps=[]):
         self.snps = snps
-        # self.snps = snps
-        # self.snp_file = snp_file
+        # self.genome_version = genome_version
 
+    # allow indexing of SNPArray object
     def __getitem__(self, i):
         return self.snps[i]
 
@@ -69,5 +70,4 @@ class SNPArray():
         snps_array = []
         with open(snp_file, 'r') as infile:
             snps_array = [SNP.convert(row)for row in infile if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
-
             return SNPArray(snps_array)
