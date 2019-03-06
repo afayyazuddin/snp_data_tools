@@ -2,8 +2,7 @@ import re
 '''import magic
 import os
 import zipfile
-import gzip
-import MySQLdb'''
+import gzip'''
 
 
 class zip_file():
@@ -72,6 +71,17 @@ class SNPArray():
             snps_array = [SNP.convert(row)for row in infile if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
             return SNPArray(snps_array)
 
+    def change_genome_version(self):
+        pass
+
+    def to_VCF(self):
+        pass
+
+
+class genome_version():
+    def __init__(self, genome_build):
+        self.genome_build = genome_build
+
     @staticmethod
     def get_genome_version(snp_file):
         with open(snp_file, 'r') as infile:
@@ -80,5 +90,12 @@ class SNPArray():
                 row = next(infile)
                 result = re.search('(?<=build )(..)', row)
                 if result is not None:
+                    genome_build = result.group(1)
                     break
-        return result.group(1)
+            if result is None:
+                while result is None:
+                    # rsids = [SNP.convert(next(infile))[0]for x in range(5)]
+                    rsid = SNP.convert(next(infile))
+                    # check rsid coordinates against coordinates for genome versions
+
+        return genome_build
