@@ -2,7 +2,9 @@ import re
 '''import magic
 import os
 import zipfile
-import gzip'''
+import gzip
+import pyliftover
+import pysam'''
 
 
 class zip_file():
