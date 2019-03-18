@@ -6,7 +6,7 @@ import gzip
 '''import pyliftover
 import pysam'''
 
-genome_build_coordinates = [["rs1003351", 3641961, 3631961,  ]]
+genome_build_coords = "./genome_build_coords.txt"
 
 
 class SNPZipFile():
@@ -47,9 +47,8 @@ class SNP():
         self.allele1 = allele1
         self.allele2 = allele2
 
-    @staticmethod
-    def convert(row):
-            row = row.strip()
+    def convert(self):
+            row = self.strip()
             splitrow = re.split('[, \t]', row)
             # splitrow=row.split(",")
             rsid = splitrow[0].strip('\"')
@@ -121,12 +120,16 @@ class GenomeVersion():
 
     def get_genome_version_from_coordinates(self):
         with open(self, 'r') as infile:
-
-            # test 10 coordinates. If 3 match a build then it is that one
-                # if build is not in metadata check rsid coordinates
-                    # against reference genome build coordinates
-                '''    if result is None:
-                        while result is None:
-                            # rsids = [SNP.convert(next(infile))[0]for x in range(5)]
-                            rsid = SNP.convert(next(infile))
-                            # check rsid coordinates against coordinates for genome versions'''
+            with open(genome_build_coords, 'r') as coords:
+                row = next(infile)
+                if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
+                    snp = SNP.convert(row)
+                    rsid = next(coords)
+                    if snp.rsid == rsid[0]:
+                        if snp.position == rsid[1]:
+                            genome_build = "36"
+                        elif snp.position == rsid[2]:
+                            genome_build = "37"
+                        elif snp.position == rsid[3]:
+                            genome_build = "38"
+                return genome_build
