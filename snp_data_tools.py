@@ -6,6 +6,8 @@ import gzip
 '''import pyliftover
 import pysam'''
 
+genome_build_coordinates = [["rs1003351", 3641961, 3631961,  ]]
+
 
 class zip_file():
     def __init__(self, zipped_file):
@@ -89,10 +91,9 @@ class SNPArray():
     def __repr__(self):
         return "{}".format(self.snps)
 
-    @staticmethod
-    def make_snp_file(snp_file):
+    def make_snp_file(self):
         snps_array = []
-        with open(snp_file, 'r') as infile:
+        with open(self, 'r') as infile:
             snps_array = [SNP.convert(row)for row in infile if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
             return SNPArray(snps_array)
 
@@ -107,9 +108,8 @@ class genome_version():
     def __init__(self, genome_build):
         self.genome_build = genome_build
 
-    @staticmethod
-    def get_genome_version(snp_file):
-        with open(snp_file, 'r') as infile:
+    def get_genome_version_from_metadata(self):
+        with open(self, 'r') as infile:
             # check for genome build in the first 25 lines
             for x in range(25):
                 row = next(infile)
@@ -117,12 +117,16 @@ class genome_version():
                 if result is not None:
                     genome_build = result.group(1)
                     break
-            # if build is not in metadata check rsid coordinates
-            # against reference genome build coordinates
-        '''    if result is None:
-                while result is None:
-                    # rsids = [SNP.convert(next(infile))[0]for x in range(5)]
-                    rsid = SNP.convert(next(infile))
-                    # check rsid coordinates against coordinates for genome versions'''
-
         return genome_build
+
+    def get_genome_version_from_coordinates(self):
+        with open(self, 'r') as infile:
+
+            # test 10 coordinates. If 3 match a build then it is that one
+                # if build is not in metadata check rsid coordinates
+                    # against reference genome build coordinates
+                '''    if result is None:
+                        while result is None:
+                            # rsids = [SNP.convert(next(infile))[0]for x in range(5)]
+                            rsid = SNP.convert(next(infile))
+                            # check rsid coordinates against coordinates for genome versions'''
