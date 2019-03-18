@@ -1,17 +1,40 @@
 import re
-'''import magic
+import magic
 import os
-import zipfile
+from zipfile import ZipFile
 import gzip
-import pyliftover
+'''import pyliftover
 import pysam'''
 
 
 class zip_file():
-    def __init__(self, phenotype):
-        self.phenotype = phenotype
+    def __init__(self, zipped_file):
+        self.zipped_file = zipped_file
 
-    pass
+    def unzip_file(self):
+        os.mkdir("./temp")
+        with ZipFile(self.zipped_file, 'r') as zip:
+            zip.extractall("./temp")
+
+    def file_type(self):
+        dir = "./temp"
+        with magic.Magic() as m:
+            for filename in os.listdir(dir):
+                file = dir+filename
+                filetype = m.id_filename(file)
+                if "ASCII" or "RSID" not in filetype:
+                    if "PDF" in filetype:
+                        print(file, "PDF")
+                    elif "gzip" in filetype:
+                        print(file, "gzip")
+                    elif "Excel" in filetype:
+                        print(file, "Excel")
+                    elif "Zip" in filetype:
+                        with ZipFile(file, 'r') as zip:
+                            zip.extractall()
+                        print(file, "Zip")
+                    else:
+                        print(file, "unknown type")
 
 
 class SNP():
@@ -94,10 +117,12 @@ class genome_version():
                 if result is not None:
                     genome_build = result.group(1)
                     break
-            if result is None:
+            # if build is not in metadata check rsid coordinates
+            # against reference genome build coordinates
+        '''    if result is None:
                 while result is None:
                     # rsids = [SNP.convert(next(infile))[0]for x in range(5)]
                     rsid = SNP.convert(next(infile))
-                    # check rsid coordinates against coordinates for genome versions
+                    # check rsid coordinates against coordinates for genome versions'''
 
         return genome_build
