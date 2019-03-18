@@ -9,7 +9,7 @@ import pysam'''
 genome_build_coordinates = [["rs1003351", 3641961, 3631961,  ]]
 
 
-class zip_file():
+class SNPZipFile():
     def __init__(self, zipped_file):
         self.zipped_file = zipped_file
 
@@ -104,7 +104,7 @@ class SNPArray():
         pass
 
 
-class genome_version():
+class GenomeVersion():
     def __init__(self, genome_build):
         self.genome_build = genome_build
 

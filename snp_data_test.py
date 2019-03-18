@@ -1,5 +1,5 @@
 import unittest
-from snp_data_tools import SNP, SNPArray
+from snp_data_tools import SNP, SNPArray, GenomeVersion
 
 
 def snp_data(snp):
@@ -47,11 +47,14 @@ class SNPArrayTests(unittest.TestCase):
         expected = ("i702862", "MT", "16312", "A", "")
         self.assertEqual(snp_data(snp_array[5]), expected)
 
+
+class GenomeVersionTests(unittest.TestCase):
+
     def test_genome_version_in_metadata(self):
         """Test pulling out genome version from file metadata"""
-        genome_version = SNPArray.get_genome_version("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt")
+        genome_build = GenomeVersion.get_genome_version_from_metadata("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt")
         expected = '37'
-        self.assertEqual(genome_version, expected)
+        self.assertEqual(genome_build, expected)
 
 
 if __name__ == "__main__":
