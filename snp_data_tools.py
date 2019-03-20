@@ -6,7 +6,7 @@ import gzip
 '''import pyliftover
 import pysam'''
 
-genome_build_coords = "./genome_build_coords.txt"
+genome_build_coords = "/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt"
 
 
 class SNPZipFile():
@@ -50,7 +50,6 @@ class SNP():
     def convert(self):
             row = self.strip()
             splitrow = re.split('[, \t]', row)
-            # splitrow=row.split(",")
             rsid = splitrow[0].strip('\"')
             chromosome = splitrow[1].strip('\"')
             position = splitrow[2].strip('\"')
@@ -78,7 +77,6 @@ class SNP():
 class SNPArray():
     def __init__(self, snps=[]):
         self.snps = snps
-        # self.genome_version = genome_version
 
     # allow indexing of SNPArray object
     def __getitem__(self, i):
@@ -119,17 +117,22 @@ class GenomeVersion():
         return genome_build
 
     def get_genome_version_from_coordinates(self):
+        match = False
         with open(self, 'r') as infile:
             with open(genome_build_coords, 'r') as coords:
-                row = next(infile)
-                if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
-                    snp = SNP.convert(row)
-                    rsid = next(coords)
-                    if snp.rsid == rsid[0]:
-                        if snp.position == rsid[1]:
-                            genome_build = "36"
-                        elif snp.position == rsid[2]:
-                            genome_build = "37"
-                        elif snp.position == rsid[3]:
-                            genome_build = "38"
-                return genome_build
+                while match is not True:
+                    row = next(infile)
+                    if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
+                        snp = SNP.convert(row)
+                        rsid = next(coords)
+                        rsid = rsid.strip()
+                        rsid = rsid.split("\t")
+                        if snp.rsid == rsid[0]:
+                            match = True
+                            if snp.position == rsid[1]:
+                                genome_build = "36"
+                            elif snp.position == rsid[2]:
+                                genome_build = "37"
+                            elif snp.position == rsid[3]:
+                                genome_build = "38"
+                            return genome_build

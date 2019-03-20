@@ -56,6 +56,12 @@ class GenomeVersionTests(unittest.TestCase):
         expected = '37'
         self.assertEqual(genome_build, expected)
 
+    def test_genome_version_from_coords(self):
+        """Test getting genome version from coordinates"""
+        genome_build = GenomeVersion.get_genome_version_from_coordinates("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test_coords.txt")
+        expected = '37'
+        self.assertEqual(genome_build, expected)
+
 
 if __name__ == "__main__":
     unittest.main()
