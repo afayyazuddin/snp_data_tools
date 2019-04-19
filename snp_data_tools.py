@@ -135,9 +135,8 @@ class SNPArray():
 
     def make_snp_file(self):
         snps_array = []
-        with open(self, 'r') as infile:
-            snps_array = [SNP.convert(row)for row in infile if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
-            return SNPArray(snps_array)
+        snps_array = [SNP.convert(row)for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
+        return SNPArray(snps_array)
 
     def change_genome_version(self):
         pass
@@ -151,33 +150,32 @@ class GenomeVersion():
         self.genome_build = genome_build
 
     def get_genome_version_from_metadata(self):
-        with open(self, 'r') as infile:
-            # check for genome build in the first 25 lines
-            for x in range(25):
-                row = next(infile)
-                result = re.search('(?<=build )(..)', row)
-                if result is not None:
-                    genome_build = result.group(1)
-                    break
+        # check for genome build in the first 25 lines
+        for x in range(25):
+            row = self[x]
+            result = re.search('(?<=build )(..)', row)
+            if result is not None:
+                genome_build = result.group(1)
+                break
         return genome_build
 
     def get_genome_version_from_coordinates(self):
         match = False
-        with open(self, 'r') as infile:
-            with open(genome_build_coords, 'r') as coords:
-                while match is not True:
-                    row = next(infile)
-                    if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
-                        snp = SNP.convert(row)
-                        rsid = next(coords)
-                        rsid = rsid.strip()
-                        rsid = rsid.split("\t")
-                        if snp.rsid == rsid[0]:
-                            match = True
-                            if snp.position == rsid[1]:
-                                genome_build = "36"
-                            elif snp.position == rsid[2]:
-                                genome_build = "37"
-                            elif snp.position == rsid[3]:
-                                genome_build = "38"
-                            return genome_build
+        #with open(self, 'r') as infile:
+        with open(genome_build_coords, 'r') as coords:
+            while match is not True:
+                row = next(iter(self))
+                if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
+                    snp = SNP.convert(row)
+                    rsid = next(coords)
+                    rsid = rsid.strip()
+                    rsid = rsid.split("\t")
+                    if snp.rsid == rsid[0]:
+                        match = True
+                        if snp.position == rsid[1]:
+                            genome_build = "36"
+                        elif snp.position == rsid[2]:
+                            genome_build = "37"
+                        elif snp.position == rsid[3]:
+                            genome_build = "38"
+                        return genome_build

@@ -1,6 +1,8 @@
 import unittest
 from snp_data_tools import SNP, SNPArray, GenomeVersion
 
+with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
+    input_file = infile.readlines()
 
 def snp_data(snp):
     """Return tuple of chromosome data"""
@@ -37,13 +39,17 @@ class SNPArrayTests(unittest.TestCase):
 
     def test_23andMe_file_autosome(self):
         """Test conversion of 23andMe file for autosome"""
-        snp_array = SNPArray.make_snp_file("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt")
+        # with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
+        #    input_file = infile.readlines()
+        snp_array = SNPArray.make_snp_file(input_file)
         expected = ("rs4477212", "1", "82154", "A", "A")
         self.assertEqual(snp_data(snp_array[0]), expected)
 
     def test_23andMe_file_MT(self):
         """Test conversion of 23andMe file for MT chromosome"""
-        snp_array = SNPArray.make_snp_file("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt")
+        # with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
+        #    input_file = infile.readlines()
+        snp_array = SNPArray.make_snp_file(input_file)
         expected = ("i702862", "MT", "16312", "A", "")
         self.assertEqual(snp_data(snp_array[5]), expected)
 
@@ -52,13 +58,15 @@ class GenomeVersionTests(unittest.TestCase):
 
     def test_genome_version_in_metadata(self):
         """Test pulling out genome version from file metadata"""
-        genome_build = GenomeVersion.get_genome_version_from_metadata("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt")
+        genome_build = GenomeVersion.get_genome_version_from_metadata(input_file)
         expected = '37'
         self.assertEqual(genome_build, expected)
 
     def test_genome_version_from_coords(self):
         """Test getting genome version from coordinates"""
-        genome_build = GenomeVersion.get_genome_version_from_coordinates("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test_coords.txt")
+        with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test_coords.txt", 'r') as infile:
+            test_coords = infile.readlines()
+        genome_build = GenomeVersion.get_genome_version_from_coordinates(test_coords)
         expected = '37'
         self.assertEqual(genome_build, expected)
 
