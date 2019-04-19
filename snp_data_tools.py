@@ -2,6 +2,7 @@ import re
 import magic
 import os
 from zipfile import ZipFile
+import xlrd
 import gzip
 '''import pyliftover
 import pysam'''
@@ -18,7 +19,7 @@ class SNPZipFile():
         with ZipFile(self.zipped_file, 'r') as zip:
             zip.extractall("./temp")
 
-    def file_type(self):
+    '''def file_type(self):
         dir = "./temp"
         with magic.Magic() as m:
             for filename in os.listdir(dir):
@@ -36,9 +37,53 @@ class SNPZipFile():
                             zip.extractall()
                         print(file, "Zip")
                     else:
+                        print(file, "unknown type")'''
+
+
+class FileType():
+    def __init__(self, file_type):
+        self.file_type = file_type
+
+    def extract_file_type():
+        with magic.Magic() as m:
+            for filename in os.listdir(dir):
+                file = dir+filename
+                filetype = m.id_filename(file)
+                # split filename into user and file and write files into temp directory with txt suffix
+                if "ASCII" or "RSID" not in filetype:
+                    if "PDF" in filetype:
+                        file.convert_pdf()
+                    elif "gzip" in filetype:
+                        file.convert_gzip()
+                    elif "Excel" in filetype:
+                        file.convert_excel()
+                    elif "Zip" in filetype:
+                        file.convert_zip()
+                    elif "text" in filetype:
+                        pass
+                    else:
                         print(file, "unknown type")
 
+    def convert_zip():
+        pass
 
+    def convert_pdf():
+        pass
+
+    def convert_gzip():
+        pass
+
+    def convert_excel(self):
+        workbook = xlrd.open_workbook(self)
+        # workbook.sheet_names()
+        first_sheet = workbook.sheet_by_index(0)
+        with open(self, 'w') as outfile:
+            for rownum in range(first_sheet.nrows):
+                outfile.write(first_sheet.row_values(rownum))
+
+
+# SNP class encodes the genome coordinates and alleles of each
+# variant in the genotype file
 class SNP():
     def __init__(self, rsid, chromosome, position, allele1, allele2):
         self.rsid = rsid
