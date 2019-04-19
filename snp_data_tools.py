@@ -94,24 +94,24 @@ class SNP():
         self.allele2 = allele2
 
     def convert(self):
-            row = self.strip()
-            splitrow = re.split('[, \t]', row)
-            rsid = splitrow[0].strip('\"')
-            chromosome = splitrow[1].strip('\"')
-            position = splitrow[2].strip('\"')
-            splitrow[3] = splitrow[3].strip('\"')
-            if len(splitrow) == 5:
-                allele1 = splitrow[3]
-                allele2 = splitrow[4]
+        row = self.strip()
+        splitrow = re.split('[, \t]', row)
+        rsid = splitrow[0].strip('\"')
+        chromosome = splitrow[1].strip('\"')
+        position = splitrow[2].strip('\"')
+        splitrow[3] = splitrow[3].strip('\"')
+        if len(splitrow) == 5:
+            allele1 = splitrow[3]
+            allele2 = splitrow[4]
+        else:
+            if len(splitrow[3]) == 2:
+                allele1 = splitrow[3][0]
+                allele2 = splitrow[3][1]
             else:
-                if len(splitrow[3]) == 2:
-                    allele1 = splitrow[3][0]
-                    allele2 = splitrow[3][1]
-                else:
-                    allele1 = splitrow[3][0]
-                    allele2 = ""
+                allele1 = splitrow[3][0]
+                allele2 = ""
 
-            return SNP(rsid, chromosome, position, allele1, allele2)
+        return SNP(rsid, chromosome, position, allele1, allele2)
 
     def __str__(self):
         return "{} at chromosome {} position {} with variants {} and {}".format(self.rsid, self.chromosome, self.position, self.allele1, self.allele2)
