@@ -7,7 +7,8 @@ import gzip
 '''import pyliftover
 import pysam'''
 
-genome_build_coords = "/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt"
+with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt", 'r') as infile:
+    coords = iter(infile.readlines())
 
 
 class SNPZipFile():
@@ -161,21 +162,20 @@ class GenomeVersion():
 
     def get_genome_version_from_coordinates(self):
         match = False
-        #with open(self, 'r') as infile:
-        with open(genome_build_coords, 'r') as coords:
-            while match is not True:
-                row = next(iter(self))
-                if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
-                    snp = SNP.convert(row)
-                    rsid = next(coords)
-                    rsid = rsid.strip()
-                    rsid = rsid.split("\t")
-                    if snp.rsid == rsid[0]:
-                        match = True
-                        if snp.position == rsid[1]:
-                            genome_build = "36"
-                        elif snp.position == rsid[2]:
-                            genome_build = "37"
-                        elif snp.position == rsid[3]:
-                            genome_build = "38"
-                        return genome_build
+        file = iter(self)
+        while match is not True:
+            row = next(file)
+            if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
+                snp = SNP.convert(row)
+                rsid = next(coords)
+                rsid = rsid.strip()
+                rsid = rsid.split("\t")
+                if snp.rsid == rsid[0]:
+                    match = True
+                    if snp.position == rsid[1]:
+                        genome_build = "36"
+                    elif snp.position == rsid[2]:
+                        genome_build = "37"
+                    elif snp.position == rsid[3]:
+                        genome_build = "38"
+                    return genome_build
