@@ -11,7 +11,7 @@ with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt
     coords = iter(infile.readlines())
 
 
-class SNPZipFile():
+'''class SNPZipFile():
     def __init__(self, zipped_file):
         self.zipped_file = zipped_file
 
@@ -20,50 +20,19 @@ class SNPZipFile():
         with ZipFile(self.zipped_file, 'r') as zip:
             zip.extractall("./temp")
 
-    '''def file_type(self):
-        dir = "./temp"
-        with magic.Magic() as m:
-            for filename in os.listdir(dir):
-                file = dir+filename
-                filetype = m.id_filename(file)
-                if "ASCII" or "RSID" not in filetype:
-                    if "PDF" in filetype:
-                        print(file, "PDF")
-                    elif "gzip" in filetype:
-                        print(file, "gzip")
-                    elif "Excel" in filetype:
-                        print(file, "Excel")
-                    elif "Zip" in filetype:
-                        with ZipFile(file, 'r') as zip:
-                            zip.extractall()
-                        print(file, "Zip")
-                    else:
-                        print(file, "unknown type")'''
-
-
-class FileType():
-    def __init__(self, file_type):
-        self.file_type = file_type
-
-    def extract_file_type():
-        with magic.Magic() as m:
-            for filename in os.listdir(dir):
-                file = dir+filename
-                filetype = m.id_filename(file)
-                # split filename into user and file and write files into temp directory with txt suffix
-                if "ASCII" or "RSID" not in filetype:
-                    if "PDF" in filetype:
-                        file.convert_pdf()
-                    elif "gzip" in filetype:
-                        file.convert_gzip()
-                    elif "Excel" in filetype:
-                        file.convert_excel()
-                    elif "Zip" in filetype:
-                        file.convert_zip()
-                    elif "text" in filetype:
-                        pass
-                    else:
-                        print(file, "unknown type")
+    if "ASCII" or "RSID" not in filetype:
+        if "PDF" in filetype:
+            file.convert_pdf()
+        elif "gzip" in filetype:
+            file.convert_gzip()
+        elif "Excel" in filetype:
+            file.convert_excel()
+        elif "Zip" in filetype:
+            file.convert_zip()
+        elif "text" in filetype:
+            pass
+        else:
+            print(file, "unknown type")
 
     def convert_zip():
         pass
@@ -80,7 +49,7 @@ class FileType():
         first_sheet = workbook.sheet_by_index(0)
         with open(self, 'w') as outfile:
             for rownum in range(first_sheet.nrows):
-                outfile.write(first_sheet.row_values(rownum))
+                outfile.write(first_sheet.row_values(rownum))'''
 
 
 # SNP class encodes the genome coordinates and alleles of each
@@ -134,21 +103,11 @@ class SNPArray():
     def __repr__(self):
         return "{}".format(self.snps)
 
-    def make_snp_file(self):
-        snps_array = []
-        snps_array = [SNP.convert(row)for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
-        return SNPArray(snps_array)
-
-    def change_genome_version(self):
-        pass
-
-    def to_VCF(self):
-        pass
-
-
-class GenomeVersion():
-    def __init__(self, genome_build):
-        self.genome_build = genome_build
+    def extract_file_type(self):
+        with magic.Magic() as m:
+            # for filename in os.listdir(dir):
+            #    file = dir+filename
+            return m.id_filename(self)
 
     def get_genome_version_from_metadata(self):
         # check for genome build in the first 25 lines
@@ -179,3 +138,15 @@ class GenomeVersion():
                     elif snp.position == rsid[3]:
                         genome_build = "38"
                     return genome_build
+
+    def change_genome_version(self):
+        pass
+
+    def to_VCF(self):
+        pass
+
+    def make_snp_file(self):
+        snps_array = []
+        # put in if-else to direct it to convert coordinates if genome version is different from desired one
+        snps_array = [SNP.convert(row)for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
+        return SNPArray(snps_array)

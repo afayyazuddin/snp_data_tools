@@ -1,5 +1,5 @@
 import unittest
-from snp_data_tools import SNP, SNPArray, GenomeVersion
+from snp_data_tools import SNP, SNPArray
 
 with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
     input_file = infile.readlines()
@@ -53,12 +53,9 @@ class SNPArrayTests(unittest.TestCase):
         expected = ("i702862", "MT", "16312", "A", "")
         self.assertEqual(snp_data(snp_array[5]), expected)
 
-
-class GenomeVersionTests(unittest.TestCase):
-
     def test_genome_version_in_metadata(self):
         """Test pulling out genome version from file metadata"""
-        genome_build = GenomeVersion.get_genome_version_from_metadata(input_file)
+        genome_build = SNPArray.get_genome_version_from_metadata(input_file)
         expected = '37'
         self.assertEqual(genome_build, expected)
 
@@ -66,7 +63,7 @@ class GenomeVersionTests(unittest.TestCase):
         """Test getting genome version from coordinates"""
         with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test_coords.txt", 'r') as infile:
             test_coords = infile.readlines()
-        genome_build = GenomeVersion.get_genome_version_from_coordinates(test_coords)
+        genome_build = SNPArray.get_genome_version_from_coordinates(test_coords)
         expected = '37'
         self.assertEqual(genome_build, expected)
 
