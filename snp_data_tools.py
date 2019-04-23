@@ -1,40 +1,19 @@
 import re
+import argparse
 import magic
+import sys
 import os
 from zipfile import ZipFile
 import xlrd
 import gzip
-'''import pyliftover
-import pysam'''
+import pyliftover
+import pysam
 
 with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt", 'r') as infile:
     coords = iter(infile.readlines())
 
 
-'''class SNPZipFile():
-    def __init__(self, zipped_file):
-        self.zipped_file = zipped_file
-
-    def unzip_file(self):
-        os.mkdir("./temp")
-        with ZipFile(self.zipped_file, 'r') as zip:
-            zip.extractall("./temp")
-
-    if "ASCII" or "RSID" not in filetype:
-        if "PDF" in filetype:
-            file.convert_pdf()
-        elif "gzip" in filetype:
-            file.convert_gzip()
-        elif "Excel" in filetype:
-            file.convert_excel()
-        elif "Zip" in filetype:
-            file.convert_zip()
-        elif "text" in filetype:
-            pass
-        else:
-            print(file, "unknown type")
-
-    def convert_zip():
+'''def convert_zip():
         pass
 
     def convert_pdf():
@@ -147,6 +126,40 @@ class SNPArray():
 
     def make_snp_file(self):
         snps_array = []
+        '''if [row[0].startswith("#") for row in self]:
+            genome_build = self.get_genome_version_from_metadata()
+        else:
+            genome_build = self.get_genome_version_from_coordinates()'''
         # put in if-else to direct it to convert coordinates if genome version is different from desired one
         snps_array = [SNP.convert(row)for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
         return SNPArray(snps_array)
+
+
+if __name__ == "__main__":
+    # args = parse_args(sys.argv[1:])
+    parser = argparse.ArgumentParser(sys.argv[1:])
+    # parser.add_argument("-f", "--files", help="filenames with type")
+    parser.add_argument("-g", "--genome", help="reference genome build, \
+    default = 37")
+    # parser.add_argument("-o", "--output", help="output directory")
+    parser.add_argument("-i", "--input", help="input directory")
+    # parser.add_argument("-f", "--format", help="output format \
+    # default = vcf: VCF")
+    arguments = parser.parse_args()
+    print(arguments)
+    for file in os.listdir(arguments.input):
+        file_name = arguments.input + "/" + file
+        if "text" in SNPArray.extract_file_type(file_name):
+            print(file, "text")
+        elif "PDF" in SNPArray.extract_file_type(file_name):
+            print("PDF")
+        elif "gzip" in SNPArray.extract_file_type(file_name):
+            print(file, "gzip")
+        elif "Excel" in SNPArray.extract_file_type(file_name):
+            print(file, "Excel")
+        elif "Zip" in SNPArray.extract_file_type(file_name):
+            print(file, "zip")
+        else:
+            print(file, "unknown type")
+            # with open(file, 'r'):
+            #    SNPArray.make_snp_file(file)'''
