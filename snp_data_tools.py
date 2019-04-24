@@ -3,6 +3,7 @@ import argparse
 import magic
 import sys
 import os
+import csv
 from zipfile import ZipFile
 import xlrd
 import gzip
@@ -124,15 +125,41 @@ class SNPArray():
     def to_VCF(self):
         pass
 
-    def make_snp_file(self):
+    '''def make_snp_file(self):
         snps_array = []
-        '''if [row[0].startswith("#") for row in self]:
+        if [row[0].startswith("#") for row in self]:
             genome_build = self.get_genome_version_from_metadata()
         else:
-            genome_build = self.get_genome_version_from_coordinates()'''
+            genome_build = self.get_genome_version_from_coordinates()
         # put in if-else to direct it to convert coordinates if genome version is different from desired one
         snps_array = [SNP.convert(row)for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
-        return SNPArray(snps_array)
+        for row in self:
+            if not row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"):
+                snps_array =
+        return SNPArray(snps_array)'''
+
+    def convert_text(self, outdir):
+        file_identifier = self.split("/")[-1].split("_")
+        user = file_identifier[0]
+        file = file_identifier[1]
+        out_dir_file = outdir + "/" + user + "_" + file + ".txt"
+        with open(self, 'r') as infile:
+            with open(out_dir_file, 'w') as outfile:
+                csv_writer = csv.writer(outfile, delimiter="\t")
+                x = 1
+                for row in infile:
+                    if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
+                        '''print(row)
+                        x = x + 1
+                        if x == 11:
+                            break'''
+                        SNP_row = SNP.convert(row)
+                        csv_writer.writerow((SNP_row.rsid, SNP_row.chromosome, SNP_row.position, SNP_row.allele1 + SNP_row.allele2))
+                        # convert SNP to row
+
+            #filetype = infile.extract_file_type()
+            #return filetype
+            #return infile.make_snp_file()
 
 
 if __name__ == "__main__":
@@ -141,25 +168,32 @@ if __name__ == "__main__":
     # parser.add_argument("-f", "--files", help="filenames with type")
     parser.add_argument("-g", "--genome", help="reference genome build, \
     default = 37")
-    # parser.add_argument("-o", "--output", help="output directory")
+    parser.add_argument("-o", "--output", help="output directory")
     parser.add_argument("-i", "--input", help="input directory")
     # parser.add_argument("-f", "--format", help="output format \
     # default = vcf: VCF")
     arguments = parser.parse_args()
     print(arguments)
     for file in os.listdir(arguments.input):
-        file_name = arguments.input + "/" + file
-        if "text" in SNPArray.extract_file_type(file_name):
-            print(file, "text")
-        elif "PDF" in SNPArray.extract_file_type(file_name):
-            print("PDF")
-        elif "gzip" in SNPArray.extract_file_type(file_name):
-            print(file, "gzip")
-        elif "Excel" in SNPArray.extract_file_type(file_name):
-            print(file, "Excel")
-        elif "Zip" in SNPArray.extract_file_type(file_name):
-            print(file, "zip")
+        if os.path.isdir(file):
+            pass
+        elif file.startswith("."):
+            pass
         else:
-            print(file, "unknown type")
-            # with open(file, 'r'):
-            #    SNPArray.make_snp_file(file)'''
+            file_name = arguments.input + "/" + file
+            # print(file_name)
+            if "text" in SNPArray.extract_file_type(file_name):
+                SNPArray.convert_text(file_name, arguments.output)
+                print("text")
+            elif "PDF" in SNPArray.extract_file_type(file_name):
+                print("PDF")
+            elif "gzip" in SNPArray.extract_file_type(file_name):
+                print(file, "gzip")
+            elif "Excel" in SNPArray.extract_file_type(file_name):
+                print(file, "Excel")
+            elif "Zip" in SNPArray.extract_file_type(file_name):
+                print(file, "zip")
+            else:
+                print(file, "unknown type")
+                # with open(file, 'r'):
+                #    SNPArray.make_snp_file(file)'''

@@ -37,7 +37,7 @@ class zip_file_Tests(unittest.TestCase):
 
 class SNPArrayTests(unittest.TestCase):
 
-    def test_23andMe_file_autosome(self):
+    '''def test_23andMe_file_autosome(self):
         """Test conversion of 23andMe file for autosome"""
         # with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
         #    input_file = infile.readlines()
@@ -51,7 +51,7 @@ class SNPArrayTests(unittest.TestCase):
         #    input_file = infile.readlines()
         snp_array = SNPArray.make_snp_file(input_file)
         expected = ("i702862", "MT", "16312", "A", "")
-        self.assertEqual(snp_data(snp_array[5]), expected)
+        self.assertEqual(snp_data(snp_array[5]), expected)'''
 
     def test_genome_version_in_metadata(self):
         """Test pulling out genome version from file metadata"""
