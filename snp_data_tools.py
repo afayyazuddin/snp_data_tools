@@ -8,10 +8,16 @@ from zipfile import ZipFile
 import xlrd
 import gzip
 import pyliftover
-import pysam
+# import pysam
 
 with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt", 'r') as infile:
     coords = iter(infile.readlines())
+
+
+def write_file(self):
+    with open(out_dir_file, 'w') as outfile:
+        csv_writer = csv.writer(outfile, delimiter="\t")
+        csv_writer.writerows(self)
 
 
 '''def convert_zip():
@@ -122,8 +128,8 @@ class SNPArray():
     def change_genome_version(self):
         pass
 
-    def to_VCF(self):
-        pass
+    '''def to_VCF(self):
+        pass'''
 
     '''def make_snp_file(self):
         snps_array = []
@@ -138,34 +144,17 @@ class SNPArray():
                 snps_array =
         return SNPArray(snps_array)'''
 
-    def convert_text(self, outdir):
-        file_identifier = self.split("/")[-1].split("_")
-        user = file_identifier[0]
-        file = file_identifier[1]
-        out_dir_file = outdir + "/" + user + "_" + file + ".txt"
-        with open(self, 'r') as infile:
-            with open(out_dir_file, 'w') as outfile:
-                csv_writer = csv.writer(outfile, delimiter="\t")
-                x = 1
-                for row in infile:
-                    if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
-                        '''print(row)
-                        x = x + 1
-                        if x == 11:
-                            break'''
-                        SNP_row = SNP.convert(row)
-                        csv_writer.writerow((SNP_row.rsid, SNP_row.chromosome, SNP_row.position, SNP_row.allele1 + SNP_row.allele2))
-                        # convert SNP to row
-
-            #filetype = infile.extract_file_type()
-            #return filetype
-            #return infile.make_snp_file()
+    def convert_text(self):
+        snps_array = []
+        for row in infile:
+            if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
+                SNP_row = SNP.convert(row)
+                snps_array.append(SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + "\t" + SNP_row.allele2)
+        return snps_array
 
 
 if __name__ == "__main__":
-    # args = parse_args(sys.argv[1:])
     parser = argparse.ArgumentParser(sys.argv[1:])
-    # parser.add_argument("-f", "--files", help="filenames with type")
     parser.add_argument("-g", "--genome", help="reference genome build, \
     default = 37")
     parser.add_argument("-o", "--output", help="output directory")
@@ -181,9 +170,14 @@ if __name__ == "__main__":
             pass
         else:
             file_name = arguments.input + "/" + file
-            # print(file_name)
+            file_identifier = file.split("/")[-1].split("_")
+            user = file_identifier[0]
+            file = file_identifier[1]
+            out_dir_file = arguments.output + "/" + user + "_" + file + ".txt"
             if "text" in SNPArray.extract_file_type(file_name):
-                SNPArray.convert_text(file_name, arguments.output)
+                with open(file_name, 'r') as infile:
+                    snp_file = SNPArray.convert_text(infile)
+                    write_file(snp_file)
                 print("text")
             elif "PDF" in SNPArray.extract_file_type(file_name):
                 print("PDF")
@@ -195,5 +189,3 @@ if __name__ == "__main__":
                 print(file, "zip")
             else:
                 print(file, "unknown type")
-                # with open(file, 'r'):
-                #    SNPArray.make_snp_file(file)'''
