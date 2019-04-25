@@ -16,8 +16,10 @@ with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt
 
 def write_file(self):
     with open(out_dir_file, 'w') as outfile:
-        csv_writer = csv.writer(outfile, delimiter="\t")
-        csv_writer.writerows(self)
+        # outfile.write(self)
+        for row in self:
+            csv_writer = csv.writer(outfile, delimiter="\t")
+            csv_writer.writerows([row.split("\t")])
 
 
 '''def convert_zip():
@@ -146,7 +148,7 @@ class SNPArray():
 
     def convert_text(self):
         snps_array = []
-        for row in infile:
+        for row in self:
             if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
                 SNP_row = SNP.convert(row)
                 snps_array.append(SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + "\t" + SNP_row.allele2)
@@ -177,6 +179,7 @@ if __name__ == "__main__":
             if "text" in SNPArray.extract_file_type(file_name):
                 with open(file_name, 'r') as infile:
                     snp_file = SNPArray.convert_text(infile)
+                    print(snp_file[1:15])
                     write_file(snp_file)
                 print("text")
             elif "PDF" in SNPArray.extract_file_type(file_name):

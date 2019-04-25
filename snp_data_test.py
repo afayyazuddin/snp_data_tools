@@ -37,6 +37,24 @@ class zip_file_Tests(unittest.TestCase):
 
 class SNPArrayTests(unittest.TestCase):
 
+    def test_23andMe_file_autosome(self):
+        """Test conversion of 23andMe file for autosome"""
+        with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
+            input_file = infile.readlines()
+            snp_array = SNPArray.convert_text(input_file)
+        expected = "rs4477212" + "\t" + "1" + "\t" + "82154" + "\t" + "A" + "\t" + "A"
+        print(snp_array[0])
+        print(expected)
+        self.assertEqual(snp_array[0], expected)
+
+    def test_23andMe_file_MT(self):
+        """Test conversion of 23andMe file for MT chromosome"""
+        with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
+            input_file = infile.readlines()
+            snp_array = SNPArray.convert_text(input_file)
+        expected = ("i702862" + "\t" + "MT" + "\t" + "16312" + "\t" + "A" + "\t" + "")
+        self.assertEqual(snp_array[5], expected)
+
     '''def test_23andMe_file_autosome(self):
         """Test conversion of 23andMe file for autosome"""
         # with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
