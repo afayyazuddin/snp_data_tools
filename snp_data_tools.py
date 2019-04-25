@@ -179,12 +179,18 @@ if __name__ == "__main__":
             if "text" in SNPArray.extract_file_type(file_name):
                 with open(file_name, 'r') as infile:
                     snp_file = SNPArray.convert_text(infile)
-                    print(snp_file[1:15])
+                    #print(snp_file[1:15])
                     write_file(snp_file)
                 print("text")
             elif "PDF" in SNPArray.extract_file_type(file_name):
                 print("PDF")
             elif "gzip" in SNPArray.extract_file_type(file_name):
+                with gzip.open(file_name, 'r') as infile:
+                    all_data = infile.read().split()
+                    # decoded_data = all_data.decode("utf-8")
+                    decoded_file = [row.decode("utf-8")for row in all_data]
+                    snp_file = SNPArray.convert_text(decoded_file)
+                    write_file(snp_file)
                 print(file, "gzip")
             elif "Excel" in SNPArray.extract_file_type(file_name):
                 print(file, "Excel")
