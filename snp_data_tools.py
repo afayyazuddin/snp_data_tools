@@ -195,6 +195,19 @@ if __name__ == "__main__":
             elif "Excel" in SNPArray.extract_file_type(file_name):
                 print(file, "Excel")
             elif "Zip" in SNPArray.extract_file_type(file_name):
+                with ZipFile(file_name, 'r') as zip:
+                    # printing all the contents of the zip file
+                    #zip.printdir()
+                    name = zip.namelist()[0]
+                    print(name)
+                    # extracting all the files
+                    print('Extracting all the files now...')
+                    snp_file = zip.read(name).decode("utf-8")
+                    # snp_file = re.split('[\n]', snp_file)
+                    snp_file = re.split('[\r]', snp_file)
+                    snp_file = [row.replace('\n', '') for row in snp_file]
+                    print('Done!')
+                    write_file(snp_file)
                 print(file, "zip")
             else:
                 print(file, "unknown type")
