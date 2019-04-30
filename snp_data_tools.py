@@ -139,7 +139,6 @@ class SNPArray():
     def text_file(self):
         with open(self, 'r') as infile:
             snp_file = SNPArray.convert_text(infile)
-            print(snp_file[1:25])
             # print(snp_file[1:15])
             write_file(snp_file)
 
@@ -148,7 +147,6 @@ class SNPArray():
             all_data = infile.read().split()
             # decoded_data = all_data.decode("utf-8")
             decoded_file = [row.decode("utf-8")for row in all_data]
-            print(decoded_file[1:25])
             snp_file = SNPArray.convert_text(decoded_file)
             write_file(snp_file)
 
@@ -160,7 +158,6 @@ class SNPArray():
             decoded_file = decoded_file.split("\n")
             decoded_file = [row.replace('\r', '') for row in decoded_file]
             snp_file = [row for row in decoded_file if not row.startswith("#")]
-            print(snp_file[1:25])
         write_file(snp_file)
 
     def excel_file(self):
@@ -182,11 +179,7 @@ class SNPArray():
             row = rsid + "\t" + str(chromosome) + "\t" + str(position) + "\t" + alleles
             row = row.replace("\'", '')
             decoded_file.append(row)
-        # decoded_file = [''.join(row) for row in decoded_file]
-        print(decoded_file[1:25])
         snp_file = SNPArray.convert_text(decoded_file)
-        print()
-        # print(snp_file[1:25])
         write_file(snp_file)
 
 
