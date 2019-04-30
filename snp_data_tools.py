@@ -22,24 +22,6 @@ def write_file(self):
             csv_writer.writerows([row.split("\t")])
 
 
-'''def convert_zip():
-        pass
-
-    def convert_pdf():
-        pass
-
-    def convert_gzip():
-        pass
-
-    def convert_excel(self):
-        workbook = xlrd.open_workbook(self)
-        # workbook.sheet_names()
-        first_sheet = workbook.sheet_by_index(0)
-        with open(self, 'w') as outfile:
-            for rownum in range(first_sheet.nrows):
-                outfile.write(first_sheet.row_values(rownum))'''
-
-
 # SNP class encodes the genome coordinates and alleles of each
 # variant in the genotype file
 class SNP():
@@ -151,8 +133,61 @@ class SNPArray():
         for row in self:
             if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
                 SNP_row = SNP.convert(row)
-                snps_array.append(SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + "\t" + SNP_row.allele2)
+                snps_array.append(SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
         return snps_array
+
+    def text_file(self):
+        with open(self, 'r') as infile:
+            snp_file = SNPArray.convert_text(infile)
+            print(snp_file[1:25])
+            # print(snp_file[1:15])
+            write_file(snp_file)
+
+    def gzip_file(self):
+        with gzip.open(self, 'r') as infile:
+            all_data = infile.read().split()
+            # decoded_data = all_data.decode("utf-8")
+            decoded_file = [row.decode("utf-8")for row in all_data]
+            print(decoded_file[1:25])
+            snp_file = SNPArray.convert_text(decoded_file)
+            write_file(snp_file)
+
+    def zip_file(self):
+        with ZipFile(self, 'r') as zip:
+            name = zip.namelist()[0]
+            print(name)
+            decoded_file = zip.read(name).decode("utf-8")
+            decoded_file = decoded_file.split("\n")
+            decoded_file = [row.replace('\r', '') for row in decoded_file]
+            snp_file = [row for row in decoded_file if not row.startswith("#")]
+            print(snp_file[1:25])
+        write_file(snp_file)
+
+    def excel_file(self):
+        decoded_file = []
+        workbook = xlrd.open_workbook(self)
+        # workbook.sheet_names()
+        first_sheet = workbook.sheet_by_index(0)
+        for rownum in range(first_sheet.nrows):
+            rsid = str(first_sheet.cell(rownum, 0))
+            rsid = rsid.replace("text:", '')
+            chromosome = str(first_sheet.cell(rownum, 1))
+            chromosome = chromosome.split(".")[0]
+            chromosome = chromosome.replace("number:", '')
+            position = str(first_sheet.cell(rownum, 2))
+            position = position.split(".")[0]
+            position = position.replace("number:", '')
+            alleles = str(first_sheet.cell(rownum, 3))
+            alleles = alleles.replace("text:", '')
+            row = rsid + "\t" + str(chromosome) + "\t" + str(position) + "\t" + alleles
+            row = row.replace("\'", '')
+            decoded_file.append(row)
+        # decoded_file = [''.join(row) for row in decoded_file]
+        print(decoded_file[1:25])
+        snp_file = SNPArray.convert_text(decoded_file)
+        print()
+        # print(snp_file[1:25])
+        write_file(snp_file)
 
 
 if __name__ == "__main__":
@@ -177,37 +212,18 @@ if __name__ == "__main__":
             file = file_identifier[1]
             out_dir_file = arguments.output + "/" + user + "_" + file + ".txt"
             if "text" in SNPArray.extract_file_type(file_name):
-                with open(file_name, 'r') as infile:
-                    snp_file = SNPArray.convert_text(infile)
-                    #print(snp_file[1:15])
-                    write_file(snp_file)
-                print("text")
+                SNPArray.text_file(file_name)
+                print(file_name, "text")
             elif "PDF" in SNPArray.extract_file_type(file_name):
-                print("PDF")
+                print(file_name, "PDF")
             elif "gzip" in SNPArray.extract_file_type(file_name):
-                with gzip.open(file_name, 'r') as infile:
-                    all_data = infile.read().split()
-                    # decoded_data = all_data.decode("utf-8")
-                    decoded_file = [row.decode("utf-8")for row in all_data]
-                    snp_file = SNPArray.convert_text(decoded_file)
-                    write_file(snp_file)
-                print(file, "gzip")
-            elif "Excel" in SNPArray.extract_file_type(file_name):
-                print(file, "Excel")
+                SNPArray.gzip_file(file_name)
+                print(file_name, "gzip")
             elif "Zip" in SNPArray.extract_file_type(file_name):
-                with ZipFile(file_name, 'r') as zip:
-                    # printing all the contents of the zip file
-                    #zip.printdir()
-                    name = zip.namelist()[0]
-                    print(name)
-                    # extracting all the files
-                    print('Extracting all the files now...')
-                    snp_file = zip.read(name).decode("utf-8")
-                    # snp_file = re.split('[\n]', snp_file)
-                    snp_file = re.split('[\r]', snp_file)
-                    snp_file = [row.replace('\n', '') for row in snp_file]
-                    print('Done!')
-                    write_file(snp_file)
-                print(file, "zip")
+                SNPArray.zip_file(file_name)
+                print(file_name, "zip")
+            elif "Excel" in SNPArray.extract_file_type(file_name):
+                SNPArray.excel_file(file_name)
+                print(file_name, "Excel")
             else:
                 print(file, "unknown type")
