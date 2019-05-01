@@ -139,13 +139,11 @@ class SNPArray():
     def text_file(self):
         with open(self, 'r') as infile:
             snp_file = SNPArray.convert_text(infile)
-            # print(snp_file[1:15])
             write_file(snp_file)
 
     def gzip_file(self):
         with gzip.open(self, 'r') as infile:
             all_data = infile.read().split()
-            # decoded_data = all_data.decode("utf-8")
             decoded_file = [row.decode("utf-8")for row in all_data]
             snp_file = SNPArray.convert_text(decoded_file)
             write_file(snp_file)
@@ -157,13 +155,16 @@ class SNPArray():
             decoded_file = zip.read(name).decode("utf-8")
             decoded_file = decoded_file.split("\n")
             decoded_file = [row.replace('\r', '') for row in decoded_file]
-            snp_file = [row for row in decoded_file if not row.startswith("#")]
+            decoded_file = [row.replace('\"', '') for row in decoded_file]
+            print(type(decoded_file))
+            print(decoded_file[1:25])
+            decoded_file = decoded_file[:-1]
+            snp_file = SNPArray.convert_text(decoded_file)
         write_file(snp_file)
 
     def excel_file(self):
         decoded_file = []
         workbook = xlrd.open_workbook(self)
-        # workbook.sheet_names()
         first_sheet = workbook.sheet_by_index(0)
         for rownum in range(first_sheet.nrows):
             rsid = str(first_sheet.cell(rownum, 0))
