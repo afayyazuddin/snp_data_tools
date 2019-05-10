@@ -9,8 +9,10 @@ from zipfile import ZipFile
 import xlrd
 import gzip
 import pyliftover
+import time
 # import pysam
 
+start = time.time()
 with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt", 'r') as infile:
     coords = iter(infile.readlines())
 
@@ -133,7 +135,7 @@ class SNPArray():
         return (SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
 
     def multiprocess_text(self):
-        p = mp.Pool(int(arguments.threads))
+        p = mp.Pool(arguments.threads)
         result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))])
         write_file(result)
 
@@ -155,8 +157,6 @@ class SNPArray():
             decoded_file = decoded_file.split("\n")
             decoded_file = [row.replace('\r', '') for row in decoded_file]
             decoded_file = [row.replace('\"', '') for row in decoded_file]
-            print(type(decoded_file))
-            print(decoded_file[1:25])
             decoded_file = decoded_file[:-1]
             SNPArray.multiprocess_text(decoded_file)
 
@@ -184,10 +184,10 @@ class SNPArray():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(sys.argv[1:])
     parser.add_argument("-g", "--genome", help="reference genome build, \
-    default = 37")
-    parser.add_argument("-o", "--output", help="output directory")
-    parser.add_argument("-i", "--input", help="input directory")
-    parser.add_argument("-t", "--threads", help="number of threads")
+    default = 37", default=37)
+    parser.add_argument("-o", "--output", help="output directory", default="./out")
+    parser.add_argument("-i", "--input", help="input directory", default="./")
+    parser.add_argument("-t", "--threads", help="number of threads", type=int, default=1)
     # parser.add_argument("-f", "--format", help="output format \
     # default = vcf: VCF")
     arguments = parser.parse_args()
@@ -219,3 +219,7 @@ if __name__ == "__main__":
                 print(file_name, "Excel")
             else:
                 print(file, "unknown type")
+
+end = time.time()
+
+print(end - start)
