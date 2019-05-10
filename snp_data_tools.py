@@ -133,7 +133,6 @@ class SNPArray():
         return (SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
 
     def multiprocess_text(self):
-        print(arguments.threads)
         p = mp.Pool(int(arguments.threads))
         result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))])
         write_file(result)
@@ -141,15 +140,12 @@ class SNPArray():
     def text_file(self):
         with open(self, 'r') as infile:
             SNPArray.multiprocess_text(infile)
-            # snp_file = SNPArray.convert_text(infile)
-            # write_file(snp_file)
 
     def gzip_file(self):
         with gzip.open(self, 'r') as infile:
             all_data = infile.read().split()
             decoded_file = [row.decode("utf-8")for row in all_data]
-            snp_file = SNPArray.convert_text(decoded_file)
-            write_file(snp_file)
+            SNPArray.multiprocess_text(decoded_file)
 
     def zip_file(self):
         with ZipFile(self, 'r') as zip:
@@ -162,8 +158,7 @@ class SNPArray():
             print(type(decoded_file))
             print(decoded_file[1:25])
             decoded_file = decoded_file[:-1]
-            snp_file = SNPArray.convert_text(decoded_file)
-        write_file(snp_file)
+            SNPArray.multiprocess_text(decoded_file)
 
     def excel_file(self):
         decoded_file = []
@@ -183,8 +178,7 @@ class SNPArray():
             row = rsid + "\t" + str(chromosome) + "\t" + str(position) + "\t" + alleles
             row = row.replace("\'", '')
             decoded_file.append(row)
-        snp_file = SNPArray.convert_text(decoded_file)
-        write_file(snp_file)
+        SNPArray.multiprocess_text(decoded_file)
 
 
 if __name__ == "__main__":
@@ -215,13 +209,13 @@ if __name__ == "__main__":
             elif "PDF" in SNPArray.extract_file_type(file_name):
                 print(file_name, "PDF")
             elif "gzip" in SNPArray.extract_file_type(file_name):
-                # SNPArray.gzip_file(file_name)
+                SNPArray.gzip_file(file_name)
                 print(file_name, "gzip")
             elif "Zip" in SNPArray.extract_file_type(file_name):
-                # SNPArray.zip_file(file_name)
+                SNPArray.zip_file(file_name)
                 print(file_name, "zip")
             elif "Excel" in SNPArray.extract_file_type(file_name):
-                # SNPArray.excel_file(file_name)
+                SNPArray.excel_file(file_name)
                 print(file_name, "Excel")
             else:
                 print(file, "unknown type")
