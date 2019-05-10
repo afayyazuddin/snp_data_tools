@@ -3,6 +3,7 @@ import argparse
 import magic
 import sys
 import os
+import multiprocessing as mp
 import csv
 from zipfile import ZipFile
 import xlrd
@@ -16,7 +17,6 @@ with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt
 
 def write_file(self):
     with open(out_dir_file, 'w') as outfile:
-        # outfile.write(self)
         for row in self:
             csv_writer = csv.writer(outfile, delimiter="\t")
             csv_writer.writerows([row.split("\t")])
@@ -129,17 +129,20 @@ class SNPArray():
         return SNPArray(snps_array)'''
 
     def convert_text(self):
-        snps_array = []
-        for row in self:
-            if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
-                SNP_row = SNP.convert(row)
-                snps_array.append(SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
-        return snps_array
+        SNP_row = SNP.convert(self)
+        return (SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
+
+    def multiprocess_text(self):
+        print(arguments.threads)
+        p = mp.Pool(int(arguments.threads))
+        result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))])
+        write_file(result)
 
     def text_file(self):
         with open(self, 'r') as infile:
-            snp_file = SNPArray.convert_text(infile)
-            write_file(snp_file)
+            SNPArray.multiprocess_text(infile)
+            # snp_file = SNPArray.convert_text(infile)
+            # write_file(snp_file)
 
     def gzip_file(self):
         with gzip.open(self, 'r') as infile:
@@ -190,6 +193,7 @@ if __name__ == "__main__":
     default = 37")
     parser.add_argument("-o", "--output", help="output directory")
     parser.add_argument("-i", "--input", help="input directory")
+    parser.add_argument("-t", "--threads", help="number of threads")
     # parser.add_argument("-f", "--format", help="output format \
     # default = vcf: VCF")
     arguments = parser.parse_args()
@@ -211,13 +215,13 @@ if __name__ == "__main__":
             elif "PDF" in SNPArray.extract_file_type(file_name):
                 print(file_name, "PDF")
             elif "gzip" in SNPArray.extract_file_type(file_name):
-                SNPArray.gzip_file(file_name)
+                # SNPArray.gzip_file(file_name)
                 print(file_name, "gzip")
             elif "Zip" in SNPArray.extract_file_type(file_name):
-                SNPArray.zip_file(file_name)
+                # SNPArray.zip_file(file_name)
                 print(file_name, "zip")
             elif "Excel" in SNPArray.extract_file_type(file_name):
-                SNPArray.excel_file(file_name)
+                # SNPArray.excel_file(file_name)
                 print(file_name, "Excel")
             else:
                 print(file, "unknown type")
