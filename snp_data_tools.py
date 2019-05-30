@@ -8,7 +8,7 @@ import csv
 from zipfile import ZipFile
 import xlrd
 import gzip
-import pyliftover
+from pyliftover import LiftOver
 import time
 # import pysam
 
@@ -113,22 +113,6 @@ class SNPArray():
 
     def change_genome_version(self):
         pass
-
-    '''def to_VCF(self):
-        pass'''
-
-    '''def make_snp_file(self):
-        snps_array = []
-        if [row[0].startswith("#") for row in self]:
-            genome_build = self.get_genome_version_from_metadata()
-        else:
-            genome_build = self.get_genome_version_from_coordinates()
-        # put in if-else to direct it to convert coordinates if genome version is different from desired one
-        snps_array = [SNP.convert(row)for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))]
-        for row in self:
-            if not row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"):
-                snps_array =
-        return SNPArray(snps_array)'''
 
     def convert_text(self):
         SNP_row = SNP.convert(self)
