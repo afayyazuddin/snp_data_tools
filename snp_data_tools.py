@@ -8,7 +8,7 @@ import csv
 from zipfile import ZipFile
 import xlrd
 import gzip
-from pyliftover import LiftOver
+# from pyliftover import LiftOver
 import time
 # import pysam
 
@@ -51,7 +51,7 @@ class SNP():
             else:
                 allele1 = splitrow[3][0]
                 allele2 = ""
-
+        # print(SNP(rsid, chromosome, position, allele1, allele2))
         return SNP(rsid, chromosome, position, allele1, allele2)
 
     def __str__(self):
@@ -120,8 +120,9 @@ class SNPArray():
 
     def multiprocess_text(self):
         p = mp.Pool(arguments.threads)
-        result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid"))])
+        result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not row.strip())])
         write_file(result)
+        ''' ignore lines that are empty, are comments or are headers'''
 
     def text_file(self):
         with open(self, 'r') as infile:
@@ -202,7 +203,8 @@ if __name__ == "__main__":
                 SNPArray.excel_file(file_name)
                 print(file_name, "Excel")
             else:
-                print(file, "unknown type")
+                SNPArray.text_file(file_name)
+                print(file_name, "probably text")
 
 end = time.time()
 
