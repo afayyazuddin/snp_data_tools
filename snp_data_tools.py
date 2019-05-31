@@ -182,6 +182,8 @@ if __name__ == "__main__":
             pass
         elif file.startswith("."):
             pass
+        elif "exome" in file:
+            pass
         else:
             file_name = arguments.input + "/" + file
             file_identifier = file.split("/")[-1].split("_")
