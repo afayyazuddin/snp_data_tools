@@ -18,6 +18,9 @@ with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt
 
 
 def write_file(self):
+    # genome_build = SNPArray.get_genome_version_from_converted_results(self)
+    # out_dir_file = arguments.output + "/" + user + "_" + file + "gen" + genome_build + ".txt"
+    out_dir_file = arguments.output + "/" + user + "_" + file + "_" + vendor + ".txt"
     with open(out_dir_file, 'w') as outfile:
         for row in self:
             csv_writer = csv.writer(outfile, delimiter="\t")
@@ -96,7 +99,7 @@ class SNPArray():
         file = iter(self)
         while match is not True:
             row = next(file)
-            if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid")):
+            if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not (row.strip())):
                 snp = SNP.convert(row)
                 rsid = next(coords)
                 rsid = rsid.strip()
@@ -186,10 +189,11 @@ if __name__ == "__main__":
             pass
         else:
             file_name = arguments.input + "/" + file
+            vendor = file.split(".")[-2]
             file_identifier = file.split("/")[-1].split("_")
             user = file_identifier[0]
             file = file_identifier[1]
-            out_dir_file = arguments.output + "/" + user + "_" + file + ".txt"
+            print(file_name, vendor)
             if "text" in SNPArray.extract_file_type(file_name):
                 SNPArray.text_file(file_name)
                 print(file_name, "text")
