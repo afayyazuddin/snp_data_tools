@@ -10,6 +10,7 @@ import xlrd
 import gzip
 # from pyliftover import LiftOver
 import time
+import itertools
 # import pysam
 
 start = time.time()
@@ -18,9 +19,8 @@ with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt
 
 
 def write_file(self):
-    # genome_build = SNPArray.get_genome_version_from_converted_results(self)
     # out_dir_file = arguments.output + "/" + user + "_" + file + "gen" + genome_build + ".txt"
-    out_dir_file = arguments.output + "/" + user + "_" + file + "_" + vendor + ".txt"
+    out_dir_file = arguments.output + "/" + user + "_" + file + "_" + vendor + "_" + genome_build + ".txt"
     with open(out_dir_file, 'w') as outfile:
         for row in self:
             csv_writer = csv.writer(outfile, delimiter="\t")
@@ -86,8 +86,7 @@ class SNPArray():
 
     def get_genome_version_from_metadata(self):
         # check for genome build in the first 25 lines
-        for x in range(25):
-            row = self[x]
+        for row in itertools.islice(self, 25):
             result = re.search('(?<=build )(..)', row)
             if result is not None:
                 genome_build = result.group(1)
@@ -122,6 +121,16 @@ class SNPArray():
         return (SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
 
     def multiprocess_text(self):
+        global genome_build
+        if vendor == ("23andme" or "ancestry") and type(self) == '_io.TextIOWrapper':
+            # Deal with cases where the file is already read into a list
+            if self.readline().startswith("#"):
+                # Deal with cases where file doesn't have comments
+                genome_build = SNPArray.get_genome_version_from_metadata(self)
+            else:
+                genome_build = ""
+        else:
+            genome_build = ""
         p = mp.Pool(arguments.threads)
         result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not row.strip())])
         write_file(result)
