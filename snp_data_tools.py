@@ -203,7 +203,7 @@ if __name__ == "__main__":
             user = file_identifier[0]
             file = file_identifier[1]
             print(file_name, vendor)
-            if "text" in SNPArray.extract_file_type(file_name):
+            '''if "text" in SNPArray.extract_file_type(file_name):
                 SNPArray.text_file(file_name)
                 print(file_name, "text")
             elif "PDF" in SNPArray.extract_file_type(file_name):
@@ -219,7 +219,7 @@ if __name__ == "__main__":
                 print(file_name, "Excel")
             else:
                 SNPArray.text_file(file_name)
-                print(file_name, "probably text")
+                print(file_name, "probably text")'''
 
 end = time.time()
 
