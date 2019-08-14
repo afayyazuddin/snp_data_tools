@@ -138,13 +138,13 @@ class SNPArray():
 
     def text_file(self):
         with open(self, 'r') as infile:
-            SNPArray.multiprocess_text(infile)
+            return(infile)
 
     def gzip_file(self):
         with gzip.open(self, 'r') as infile:
             all_data = infile.read().split()
             decoded_file = [row.decode("utf-8")for row in all_data]
-            SNPArray.multiprocess_text(decoded_file)
+            return(decoded_file)
 
     def zip_file(self):
         with ZipFile(self, 'r') as zip:
@@ -155,7 +155,7 @@ class SNPArray():
             decoded_file = [row.replace('\r', '') for row in decoded_file]
             decoded_file = [row.replace('\"', '') for row in decoded_file]
             decoded_file = decoded_file[:-1]
-            SNPArray.multiprocess_text(decoded_file)
+            return(decoded_file)
 
     def excel_file(self):
         decoded_file = []
@@ -175,13 +175,20 @@ class SNPArray():
             row = rsid + "\t" + str(chromosome) + "\t" + str(position) + "\t" + alleles
             row = row.replace("\'", '')
             decoded_file.append(row)
-        SNPArray.multiprocess_text(decoded_file)
+        return(decoded_file)
+        # SNPArray.multiprocess_text(decoded_file)
 
+
+class SNP_file():
+    def __init__(self, vendor, user, file, genome_build):
+        self.vendor = vendor
+        self.user = user
+        self.file = file
+        self.genome_build = genome_build)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(sys.argv[1:])
-    parser.add_argument("-g", "--genome", help="reference genome build, \
-    default = 37", default=37)
+    parser.add_argument("-g", "--genome", help="reference genome build, default = 37", default=37)
     parser.add_argument("-o", "--output", help="output directory", default="./out")
     parser.add_argument("-i", "--input", help="input directory", default="./")
     parser.add_argument("-t", "--threads", help="number of threads", type=int, default=1)

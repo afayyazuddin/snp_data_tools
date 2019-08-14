@@ -85,6 +85,15 @@ class SNPArrayTests(unittest.TestCase):
         expected = '37'
         self.assertEqual(genome_build, expected)
 
+    def test_zipped_file(self):
+        """Test proper detection and uncompressing of zipped file"""
+        with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.zip", 'r') as infile:
+            unzipped = SNPArray.zip_file(infile)
+        expected = ("i702862" + "\t" + "MT" + "\t" + "16312" + "\t" + "A" + "\t" + "")
+        self.assertEqual(snp_array[5], expected)
+        with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.zip", 'r' as infile:
+            unzipped = SNPArray.zip_file(infile)
+
 
 if __name__ == "__main__":
     unittest.main()
