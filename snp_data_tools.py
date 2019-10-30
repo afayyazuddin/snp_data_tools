@@ -42,6 +42,9 @@ class SNP():
         splitrow = re.split('[, \t]', row)
         rsid = splitrow[0].strip('\"')
         chromosome = splitrow[1].strip('\"')
+        # convert Ancestry coding for X to 23andMe
+        if chromosome == "23":
+            chromosome = "X"
         position = splitrow[2].strip('\"')
         splitrow[3] = splitrow[3].strip('\"')
         if len(splitrow) == 5:

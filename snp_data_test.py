@@ -19,8 +19,8 @@ class SNPTests(unittest.TestCase):
 
     def test_ancestry_conv(self):
         """Test conversion of snp object from ancestry"""
-        snp = SNP.convert("rs4477212\t1\t82154\tA\tA")
-        expected = ("rs4477212", "1", "82154", "A", "A")
+        snp = SNP.convert("rs4477212\t23\t82154\tA\tA")
+        expected = ("rs4477212", "X", "82154", "A", "A")
         self.assertEqual(snp_data(snp), expected)
 
     def test_ftdna_conv(self):
@@ -41,8 +41,9 @@ class SNPArrayTests(unittest.TestCase):
         """Test conversion of 23andMe file for autosome"""
         with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
             input_file = infile.readlines()
-            snp_array = SNPArray.convert_text(input_file)
-        expected = "rs4477212" + "\t" + "1" + "\t" + "82154" + "\t" + "A" + "\t" + "A"
+            print(input_file)
+            snp_array = [SNPArray.convert_text(row) for row in input_file if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not row.strip())]
+        expected = "rs4477212" + "\t" + "1" + "\t" + "82154" + "\t" + "AA"
         print(snp_array[0])
         print(expected)
         self.assertEqual(snp_array[0], expected)
@@ -51,8 +52,8 @@ class SNPArrayTests(unittest.TestCase):
         """Test conversion of 23andMe file for MT chromosome"""
         with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
             input_file = infile.readlines()
-            snp_array = SNPArray.convert_text(input_file)
-        expected = ("i702862" + "\t" + "MT" + "\t" + "16312" + "\t" + "A" + "\t" + "")
+            snp_array = [SNPArray.convert_text(row) for row in input_file if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not row.strip())]
+        expected = ("i702862" + "\t" + "MT" + "\t" + "16312" + "\t" + "A")
         self.assertEqual(snp_array[5], expected)
 
     '''def test_23andMe_file_autosome(self):
