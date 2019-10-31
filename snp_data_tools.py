@@ -7,10 +7,11 @@ import multiprocessing as mp
 import csv
 from zipfile import ZipFile
 import xlrd
-import gzip
+# import gzip
 # from pyliftover import LiftOver
 import time
 import itertools
+from subprocess import Popen, PIPE
 # import pysam
 
 start = time.time()
@@ -144,10 +145,18 @@ class SNPArray():
             SNPArray.multiprocess_text(infile)
 
     def gzip_file(self):
+        '''using zcat to read gzip files. May not work in non-unix systems'''
+        f = Popen(['zcat', self], stdout=PIPE)
+        decoded_file = [line for line in f.stdout]
+        SNPArray.multiprocess_text(decoded_file)
+
+        '''
+        # The following code fails for some gzipped files without .gz extension
         with gzip.open(self, 'r') as infile:
             all_data = infile.read().split()
             decoded_file = [row.decode("utf-8")for row in all_data]
             SNPArray.multiprocess_text(decoded_file)
+            '''
 
     def zip_file(self):
         with ZipFile(self, 'r') as zip:
