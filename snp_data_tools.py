@@ -230,8 +230,8 @@ if __name__ == "__main__":
                 SNPArray.excel_file(file_name)
                 print(file_name, "Excel")
             else:
-                SNPArray.text_file(file_name)
-                print(file_name, "probably text")
+                # SNPArray.text_file(file_name)
+                print(file_name, "unknown")
 
 end = time.time()
 
