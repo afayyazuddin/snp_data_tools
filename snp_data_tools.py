@@ -208,6 +208,8 @@ if __name__ == "__main__":
             pass
         elif "exome" in file:
             pass
+        elif "IYG" in file:
+            pass
         else:
             file_name = arguments.input + "/" + file
             vendor = file.split(".")[-2]
