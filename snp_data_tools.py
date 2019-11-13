@@ -78,8 +78,12 @@ class SNP():
 
 
 class SNPArray():
-    def __init__(self, snps=[]):
-        self.snps = snps
+    def __init__(self, snps, user, opensnp_file_id, vendor, genome):
+        self.snps = []
+        self.user = user
+        self.opensnp_file_id = opensnp_file_id
+        self.vendor = vendor
+        self.genome = genome
 
     # allow indexing of SNPArray object
     def __getitem__(self, i):
@@ -90,6 +94,37 @@ class SNPArray():
 
     def __repr__(self):
         return "{}".format(self.snps)
+
+    def populate_SNPArray_metadata(self):
+        directory = self[0]
+        file = self[1]
+        file_name = directory + "/" + file
+        vendor = file.split(".")[-2]
+        file_identifier = file.split("/")[-1].split("_")
+        user = file_identifier[0]
+        opensnp_file_id = file_identifier[1]
+        print(file_name, vendor)
+        if "text" in SNPArray.extract_file_type(file_name):
+            snps = SNPArray.text_file(file_name)
+            print(file_name, "text")
+        elif "PDF" in SNPArray.extract_file_type(file_name):
+            print(file_name, "PDF")
+        elif "gzip" in SNPArray.extract_file_type(file_name):
+            snps = SNPArray.gzip_file(file_name)
+            print(file_name, "gzip")
+        elif "Zip" in SNPArray.extract_file_type(file_name):
+            snps = SNPArray.zip_file(file_name)
+            print(file_name, "zip")
+        elif "Excel" in SNPArray.extract_file_type(file_name):
+            snps = SNPArray.excel_file(file_name)
+            print(file_name, "Excel")
+        else:
+            # SNPArray.text_file(file_name)
+            print(file_name, "unknown")
+
+        genome = SNPArray.get_genome_version_from_coordinates(snps)
+
+        return SNPArray(snps, user, opensnp_file_id, vendor, genome)
 
     def extract_file_type(self):
         with magic.Magic() as m:
@@ -124,6 +159,8 @@ class SNPArray():
                         genome_build = "37"
                     elif snp.position == rsid[3]:
                         genome_build = "38"
+                    else:
+                        genome_build = "unknown_build"
                     return genome_build
 
     def change_genome_version(self):
@@ -212,6 +249,8 @@ if __name__ == "__main__":
         elif "IYG" in file:
             pass
         else:
+            SNPArray.populate_SNPArray_metadata([arguments.input, file])
+            '''
             file_name = arguments.input + "/" + file
             vendor = file.split(".")[-2]
             file_identifier = file.split("/")[-1].split("_")
@@ -234,7 +273,7 @@ if __name__ == "__main__":
                 print(file_name, "Excel")
             else:
                 # SNPArray.text_file(file_name)
-                print(file_name, "unknown")
+                print(file_name, "unknown")'''
 
 end = time.time()
 
