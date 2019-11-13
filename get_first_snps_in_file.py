@@ -1,5 +1,7 @@
 '''
-script to find the first rsid to map to identify genome build
+script to find the first rsid from arrays to identify genome build
+from coordinates
+usage: "python get_first_snps_in_file.py name_of_directory"
 '''
 import os
 import sys
