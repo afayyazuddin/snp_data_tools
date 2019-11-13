@@ -4,6 +4,7 @@ from snp_data_tools import SNP, SNPArray
 with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test.txt", 'r') as infile:
     input_file = infile.readlines()
 
+
 def snp_data(snp):
     """Return tuple of chromosome data"""
     return (snp.rsid, snp.chromosome, snp.position, snp.allele1, snp.allele2)
@@ -28,7 +29,6 @@ class SNPTests(unittest.TestCase):
         snp = SNP.convert('"rs4477212","1","82154","AA"')
         expected = ("rs4477212", "1", "82154", "A", "A")
         self.assertEqual(snp_data(snp), expected)
-
 
 
 class zip_file_Tests(unittest.TestCase):
