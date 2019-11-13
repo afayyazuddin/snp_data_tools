@@ -7,7 +7,7 @@ import multiprocessing as mp
 import csv
 from zipfile import ZipFile
 import xlrd
-# import gzip
+import gzip
 # from pyliftover import LiftOver
 import time
 import itertools
@@ -20,21 +20,12 @@ default = 37", default=37)
 parser.add_argument("-o", "--output", help="output directory", default="./out")
 parser.add_argument("-i", "--input", help="input directory", default="./")
 parser.add_argument("-t", "--threads", help="number of threads", type=int, default=1)
-# parser.add_argument("-f", "--format", help="output format \
+# parser.add_argument("-f", "--fasta", help="location of fasta files \
 # default = vcf: VCF")
 
 start = time.time()
-with open("/Users/amir/Documents/Analysis/snp_data_tools/genome_build_coords.txt", 'r') as infile:
+with open("genome_build_coords.txt", 'r') as infile:
     coords = iter(infile.readlines())
-
-
-def write_file(self):
-    # out_dir_file = arguments.output + "/" + user + "_" + file + "gen" + genome_build + ".txt"
-    out_dir_file = arguments.output + "/" + user + "_" + file + "_" + vendor + "_" + genome_build + ".txt"
-    with open(out_dir_file, 'w') as outfile:
-        for row in self:
-            csv_writer = csv.writer(outfile, delimiter="\t")
-            csv_writer.writerows([row.split("\t")])
 
 
 # SNP class encodes the genome coordinates and alleles of each
@@ -83,14 +74,14 @@ class SNPArray():
         self.user = user
         self.opensnp_file_id = opensnp_file_id
         self.vendor = vendor
-        self.genome = genome
+        self.genome = "37"  # genome
 
     # allow indexing of SNPArray object
     def __getitem__(self, i):
         return self.snps[i]
 
     def __iter__(self):
-        return self
+        return self.snps
 
     def __repr__(self):
         return "{}".format(self.snps)
@@ -122,7 +113,8 @@ class SNPArray():
             # SNPArray.text_file(file_name)
             print(file_name, "unknown")
 
-        genome = SNPArray.get_genome_version_from_coordinates(snps)
+        genome = "37"  # SNPArray.get_genome_version_from_coordinates(snps)
+        print(snps[1])
 
         return SNPArray(snps, user, opensnp_file_id, vendor, genome)
 
@@ -132,14 +124,14 @@ class SNPArray():
             #    file = dir+filename
             return m.id_filename(self)
 
-    def get_genome_version_from_metadata(self):
+    '''def get_genome_version_from_metadata(self):
         # check for genome build in the first 25 lines
         for row in itertools.islice(self, 25):
             result = re.search('(?<=build )(..)', row)
             if result is not None:
                 genome_build = result.group(1)
                 break
-        return genome_build
+        return genome_build'''
 
     def get_genome_version_from_coordinates(self):
         match = False
@@ -171,7 +163,7 @@ class SNPArray():
         return (SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
 
     def multiprocess_text(self):
-        global genome_build
+        '''global genome_build
         if vendor == ("23andme" or "ancestry") and type(self) == '_io.TextIOWrapper':
             # Deal with cases where the file is already read into a list
             if self.readline().startswith("#"):
@@ -180,29 +172,30 @@ class SNPArray():
             else:
                 genome_build = ""
         else:
-            genome_build = ""
+            genome_build = ""'''
         p = mp.Pool(arguments.threads)
         result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not row.strip())])
-        write_file(result)
+        #write_file(result)
+        return(result)
         ''' ignore lines that are empty, are comments or are headers'''
 
     def text_file(self):
         with open(self, 'r') as infile:
-            SNPArray.multiprocess_text(infile)
+            snps = SNPArray.multiprocess_text(infile)
+        return(snps)
 
     def gzip_file(self):
-        '''using zcat to read gzip files. May not work in non-unix systems'''
+        '''using zcat to read gzip files. May not work in non-unix systems
         f = Popen(['zcat', self], stdout=PIPE)
         decoded_file = [line for line in f.stdout]
-        SNPArray.multiprocess_text(decoded_file)
+        SNPArray.multiprocess_text(decoded_file)'''
 
-        '''
         # The following code fails for some gzipped files without .gz extension
         with gzip.open(self, 'r') as infile:
             all_data = infile.read().split()
             decoded_file = [row.decode("utf-8")for row in all_data]
-            SNPArray.multiprocess_text(decoded_file)
-            '''
+            snps = SNPArray.multiprocess_text(decoded_file)
+            return(snps)
 
     def zip_file(self):
         with ZipFile(self, 'r') as zip:
@@ -213,7 +206,8 @@ class SNPArray():
             decoded_file = [row.replace('\r', '') for row in decoded_file]
             decoded_file = [row.replace('\"', '') for row in decoded_file]
             decoded_file = decoded_file[:-1]
-            SNPArray.multiprocess_text(decoded_file)
+            snps = SNPArray.multiprocess_text(decoded_file)
+            return(snps)
 
     def excel_file(self):
         decoded_file = []
@@ -233,7 +227,19 @@ class SNPArray():
             row = rsid + "\t" + str(chromosome) + "\t" + str(position) + "\t" + alleles
             row = row.replace("\'", '')
             decoded_file.append(row)
-        SNPArray.multiprocess_text(decoded_file)
+        snps = SNPArray.multiprocess_text(decoded_file)
+        return(snps)
+
+    def to_vcf(self):
+        pass
+
+    def write_file(self):
+        # out_dir_file = arguments.output + "/" + user + "_" + file + "gen" + genome_build + ".txt"
+        out_dir_file = arguments.output + "/" + self.user + "_" + self.opensnp_file_id + "_" + self.vendor + "_" + self.genome + ".txt"
+        with open(out_dir_file, 'w') as outfile:
+            for row in self.snps:
+                csv_writer = csv.writer(outfile, delimiter="\t")
+                csv_writer.writerows([row.split("\t")])
 
 
 if __name__ == "__main__":
@@ -249,7 +255,8 @@ if __name__ == "__main__":
         elif "IYG" in file:
             pass
         else:
-            SNPArray.populate_SNPArray_metadata([arguments.input, file])
+            SNPArray.populate_SNPArray_metadata([arguments.input, file]).write_file()
+
             '''
             file_name = arguments.input + "/" + file
             vendor = file.split(".")[-2]
