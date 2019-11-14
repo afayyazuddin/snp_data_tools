@@ -11,7 +11,8 @@ from snp_data_tools import SNP
 directory = sys.argv[1]
 genome_list = [["hg18", "snp130"], ["hg19", "snp150"]]
 snp_list = []
-snp_coords = []
+# snp_coords = []
+snp_coords = {}
 
 for file in os.listdir(directory):
     os.listdir(directory)
@@ -28,18 +29,28 @@ for file in os.listdir(directory):
                         break
             if rsid not in snp_list:
                 snp_list.append(rsid)
-snp_list = ', '.join(['"{}"'.format(value) for value in snp_list])
+#snp_list = ', '.join(["'{}'".format(value) for value in snp_list])
 
 connection = MySQLdb.connect(host='genome-mysql.cse.ucsc.edu', user='genome', password='')
 c = connection.cursor()
 
+# output nested dictionary that contains snp coordinates for first snps
+# arranged by genome_build
 for genome_build, table in genome_list:
-    database_command = 'use {}'.format(genome_build)
-    sql_command = 'select name,chrom,chromStart from {} where name in ({})'.format(table, snp_list)
-    connection_command = "host='genome-mysql.cse.ucsc.edu', user='genome', password='', db='{}'".format(genome_build)
-    c.execute(database_command)
-    c.execute(sql_command)
-    output = c.fetchall()
-    snp_coords.append(output)
+    coords_by_genome = {}
+    for snp in snp_list:
+        database_command = 'use {}'.format(genome_build)
+        sql_command = 'select chrom,chromStart from {} where name in ("{}")'.format(table, snp)
+        connection_command = "host='genome-mysql.cse.ucsc.edu', user='genome', password='', db='{}'".format(genome_build)
+        c.execute(database_command)
+        c.execute(sql_command)
+        output = c.fetchall()
+        for row in output:
+            output = (row[0], row[1])
+        coords_by_genome[snp] = output
+    snp_coords[genome_build] = coords_by_genome
+        #snp_coords.append(output)
 print(snp_coords)
+with open('genome_build_coords.txt', 'w') as outfile:
+    outfile.write(str(snp_coords))
 connection.close()
