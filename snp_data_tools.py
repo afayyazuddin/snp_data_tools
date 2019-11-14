@@ -248,7 +248,7 @@ if __name__ == "__main__":
     for file in os.listdir(arguments.input):
         if os.path.isdir(file):
             pass
-        elif file.startswith("."):
+        elif not file.startswith("user"):
             pass
         elif "exome" in file:
             pass
