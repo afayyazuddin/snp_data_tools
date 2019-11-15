@@ -78,13 +78,22 @@ class SNPArrayTests(unittest.TestCase):
         expected = '37'
         self.assertEqual(genome_build, expected)'''
 
-    def test_genome_version_from_coords(self):
+    def test_genome_version_from_coords_hg19(self):
         """Test getting genome version from coordinates"""
         first_snp = ["rs4477212\t1\t82154\tAA"]
         # with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test_coords.txt", 'r') as infile:
         #    test_coords = infile.readlines()
         genome_build = SNPArray.get_genome_version_from_coordinates(first_snp)
         expected = 'hg19'
+        self.assertEqual(genome_build, expected)
+
+    def test_genome_version_from_coords_hg18(self):
+        """Test getting genome version from coordinates"""
+        first_snp = ["rs3094315\t1\t742429\tAG"]
+        # with open("/Users/amir/Documents/Analysis/snp_data_tools/23andme_test_coords.txt", 'r') as infile:
+        #    test_coords = infile.readlines()
+        genome_build = SNPArray.get_genome_version_from_coordinates(first_snp)
+        expected = 'hg18'
         self.assertEqual(genome_build, expected)
 
 
