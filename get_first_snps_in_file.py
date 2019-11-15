@@ -29,7 +29,6 @@ for file in os.listdir(directory):
                         break
             if rsid not in snp_list:
                 snp_list.append(rsid)
-#snp_list = ', '.join(["'{}'".format(value) for value in snp_list])
 
 connection = MySQLdb.connect(host='genome-mysql.cse.ucsc.edu', user='genome', password='')
 c = connection.cursor()
@@ -49,7 +48,7 @@ for genome_build, table in genome_list:
             output = (row[0], row[1])
         coords_by_genome[snp] = output
     snp_coords[genome_build] = coords_by_genome
-        #snp_coords.append(output)
+
 print(snp_coords)
 with open('genome_build_coords.txt', 'w') as outfile:
     outfile.write(str(snp_coords))

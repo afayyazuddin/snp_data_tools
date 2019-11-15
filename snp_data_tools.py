@@ -25,7 +25,8 @@ parser.add_argument("-t", "--threads", help="number of threads", type=int, defau
 
 start = time.time()
 with open("genome_build_coords.txt", 'r') as infile:
-    coords = iter(infile.readlines())
+    coords = infile.readlines()[0]
+    coords_dict = eval(coords)
 
 
 # SNP class encodes the genome coordinates and alleles of each
@@ -74,7 +75,7 @@ class SNPArray():
         self.user = user
         self.opensnp_file_id = opensnp_file_id
         self.vendor = vendor
-        self.genome = "37"  # genome
+        self.genome = genome  # genome
 
     # allow indexing of SNPArray object
     def __getitem__(self, i):
@@ -110,10 +111,10 @@ class SNPArray():
             snps = SNPArray.excel_file(file_name)
             print(file_name, "Excel")
         else:
-            # SNPArray.text_file(file_name)
+            snps = SNPArray.text_file(file_name)
             print(file_name, "unknown")
 
-        genome = "37"  # SNPArray.get_genome_version_from_coordinates(snps)
+        genome = SNPArray.get_genome_version_from_coordinates(snps)
         print(snps[1])
 
         return SNPArray(snps, user, opensnp_file_id, vendor, genome)
@@ -134,7 +135,20 @@ class SNPArray():
         return genome_build'''
 
     def get_genome_version_from_coordinates(self):
-        match = False
+        genome_version = ""
+        test_snp = SNP.convert(self[0])
+        for genome_version in ['hg18', 'hg19']:
+            test_coords = coords_dict.get(genome_version).get(test_snp.rsid)
+            if test_coords == ["chr"+str(test_snp.chromosome), int(test_snp.position)-1]:
+                break
+                #genome_build = genome_version
+        if genome_version == "":
+            genome_build = "unknown"
+        else:
+            genome_build = genome_version
+        return genome_build
+
+        '''match = False
         file = iter(self)
         while match is not True:
             row = next(file)
@@ -153,7 +167,7 @@ class SNPArray():
                         genome_build = "38"
                     else:
                         genome_build = "unknown_build"
-                    return genome_build
+                    return genome_build'''
 
     def change_genome_version(self):
         pass
