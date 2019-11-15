@@ -10,9 +10,9 @@ import xlrd
 import gzip
 # from pyliftover import LiftOver
 import time
-import itertools
-from subprocess import Popen, PIPE
-from pathlib import Path
+# import itertools
+# from subprocess import Popen, PIPE
+# from pathlib import Path
 # import pysam
 
 parser = argparse.ArgumentParser(sys.argv[1:])
@@ -115,7 +115,7 @@ class SNPArray():
             snps = SNPArray.text_file(file_name)
             print(file_name, "unknown")
 
-        genome = "37" # SNPArray.get_genome_version_from_coordinates(snps)
+        genome = SNPArray.get_genome_version_from_coordinates(snps)
         print(snps[1])
 
         return SNPArray(snps, user, opensnp_file_id, vendor, genome)
@@ -135,45 +135,21 @@ class SNPArray():
                 break
         return genome_build'''
 
-    '''def get_genome_version_from_coordinates(self):
-        genome_build = ""
-        genome_version = ""
+    def get_genome_version_from_coordinates(self):
         test_snp = SNP.convert(self[0])
-        for genome_version in ['hg18', 'hg19']:
-            test_coords = coords_dict.get(genome_version).get(test_snp.rsid)
-            print(test_coords[0],test_coords[1])
-            if ((test_coords[0] == "chr"+str(test_snp.chromosome)) and (test_coords[1] + 1 == "chr"+int(test_snp.position)):
+        snp_coords = ("chr"+str(test_snp.chromosome), int(test_snp.position)-1)
 
-            #if test_coords == ["chr"+str(test_snp.chromosome), int(test_snp.position)-1]:
-                #break
+        test_coords_18 = coords_dict.get('hg18').get(test_snp.rsid)
+        test_coords_19 = coords_dict.get('hg19').get(test_snp.rsid)
 
-                genome_build = genome_version
-                print(genome_build)
-        if genome_version == "":
+        if snp_coords == test_coords_18:
+            genome_build = "36"
+        elif snp_coords == test_coords_19:
+            genome_build = "37"
+        else:
             genome_build = "unknown"
 
-        return genome_build'''
-
-    '''match = False
-        file = iter(self)
-        while match is not True:
-            row = next(file)
-            if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not (row.strip())):
-                snp = SNP.convert(row)
-                rsid = next(coords)
-                rsid = rsid.strip()
-                rsid = rsid.split("\t")
-                if snp.rsid == rsid[0]:
-                    match = True
-                    if snp.position == rsid[1]:
-                        genome_build = "36"
-                    elif snp.position == rsid[2]:
-                        genome_build = "37"
-                    elif snp.position == rsid[3]:
-                        genome_build = "38"
-                    else:
-                        genome_build = "unknown_build"
-                    return genome_build'''
+        return genome_build
 
     def change_genome_version(self):
         pass

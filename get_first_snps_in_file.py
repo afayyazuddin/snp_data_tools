@@ -19,7 +19,7 @@ for file in os.listdir(directory):
     if not file.startswith("."):
         with open(directory + "/" + file, 'r') as infile:
             coords = iter(infile.readlines())
-            next(coords)
+            # next(coords)
             while True:
                 snp = next(coords)
                 if not (snp.startswith("RSID") or snp.startswith("#") or snp.startswith("rsid") or not snp.strip()):
@@ -29,6 +29,7 @@ for file in os.listdir(directory):
                         break
             if rsid not in snp_list:
                 snp_list.append(rsid)
+                print(snp_list)
 
 connection = MySQLdb.connect(host='genome-mysql.cse.ucsc.edu', user='genome', password='')
 c = connection.cursor()
