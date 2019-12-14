@@ -253,8 +253,9 @@ if __name__ == "__main__":
         elif "IYG" in file:
             pass
         else:
-            f = SNPArray.populate_SNPArray_metadata([arguments.input, file])
-            f.write_file()
+            SNPArray.populate_SNPArray_metadata([arguments.input, file])
+            # f = SNPArray.populate_SNPArray_metadata([arguments.input, file])
+            # f.write_file()
 
 end = time.time()
 

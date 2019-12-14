@@ -34,6 +34,7 @@ for file in os.listdir(directory):
 connection = MySQLdb.connect(host='genome-mysql.cse.ucsc.edu', user='genome', password='')
 c = connection.cursor()
 
+# get SNP coordinates from UCSC SNP database using mysql query
 # output nested dictionary that contains snp coordinates for first snps
 # arranged by genome_build
 for genome_build, table in genome_list:
@@ -41,7 +42,6 @@ for genome_build, table in genome_list:
     for snp in snp_list:
         database_command = 'use {}'.format(genome_build)
         sql_command = 'select chrom,chromStart from {} where name in ("{}")'.format(table, snp)
-        connection_command = "host='genome-mysql.cse.ucsc.edu', user='genome', password='', db='{}'".format(genome_build)
         c.execute(database_command)
         c.execute(sql_command)
         output = c.fetchall()
