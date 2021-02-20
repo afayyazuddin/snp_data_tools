@@ -16,11 +16,18 @@ import time
 # import pysam
 
 parser = argparse.ArgumentParser(sys.argv[1:])
-parser.add_argument("-g", "--genome", help="reference genome build, \
-default = 37", default=37)
-parser.add_argument("-o", "--output", help="output directory", default="./out")
-parser.add_argument("-i", "--input", help="input directory", default="./")
-parser.add_argument("-t", "--threads", help="number of threads", type=int, default=1)
+parser.add_argument("-g", "--genome",
+                    help="reference genome build, default = 37",
+                    default=37)
+parser.add_argument("-o", "--output",
+                    help="output directory",
+                    default="./out")
+parser.add_argument("-i", "--input",
+                    help="input directory",
+                    default="./")
+parser.add_argument("-t", "--threads",
+                    help="number of threads",
+                    type=int, default=1)
 # parser.add_argument("-f", "--fasta", help="location of fasta files \
 # default = vcf: VCF")
 
