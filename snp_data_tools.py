@@ -8,7 +8,7 @@ import csv
 from zipfile import ZipFile
 import xlrd
 import gzip
-# from pyliftover import LiftOver
+from pyliftover import LiftOver
 import time
 # import itertools
 # from subprocess import Popen, PIPE
@@ -28,6 +28,11 @@ parser.add_argument("-i", "--input",
 parser.add_argument("-t", "--threads",
                     help="number of threads",
                     type=int, default=1)
+parser.add_argument("-f", "--format",
+                    help="output format, default is 23andMe",
+                    default="23andMe",
+                    choices=['23andMe', 'bed'])
+
 # parser.add_argument("-f", "--fasta", help="location of fasta files \
 # default = vcf: VCF")
 
@@ -71,10 +76,20 @@ class SNP():
         return SNP(rsid, chromosome, position, allele1, allele2)
 
     def __str__(self):
-        return "{} at chromosome {} position {} with variants {} and {}".format(self.rsid, self.chromosome, self.position, self.allele1, self.allele2)
+        return "{} at chromosome {} position {} with \
+        variants {} and {}".format(self.rsid,
+                                   self.chromosome,
+                                   self.position,
+                                   self.allele1,
+                                   self.allele2)
 
     def __repr__(self):
-        return "SNP (rsid={}, chromosome={}, position={}, allele1={}, allele2={})".format(self.rsid, self.chromosome, self.position, self.allele1, self.allele2)
+        return "SNP (rsid={}, chromosome={}, position={}, \
+        allele1={}, allele2={})".format(self.rsid,
+                                        self.chromosome,
+                                        self.position,
+                                        self.allele1,
+                                        self.allele2)
 
 
 class SNPArray():
@@ -163,11 +178,16 @@ class SNPArray():
 
     def convert_text(self):
         SNP_row = SNP.convert(self)
-        return (SNP_row.rsid + "\t" + SNP_row.chromosome + "\t" + SNP_row.position + "\t" + SNP_row.allele1 + SNP_row.allele2)
+        return (SNP_row.rsid + "\t"
+                + SNP_row.chromosome + "\t"
+                + SNP_row.position
+                + "\t"
+                + SNP_row.allele1 + SNP_row.allele2)
 
     def multiprocess_text(self):
         '''global genome_build
-        if vendor == ("23andme" or "ancestry") and type(self) == '_io.TextIOWrapper':
+        if vendor == ("23andme" or "ancestry") and
+                      type(self) == '_io.TextIOWrapper':
             # Deal with cases where the file is already read into a list
             if self.readline().startswith("#"):
                 # Deal with cases where file doesn't have comments
@@ -177,8 +197,12 @@ class SNPArray():
         else:
             genome_build = ""'''
         p = mp.Pool(arguments.threads)
-        result = p.map(SNPArray.convert_text, [row for row in self if not (row.startswith("RSID") or row.startswith("#") or row.startswith("rsid") or not row.strip())])
-        #write_file(result)
+        result = p.map(SNPArray.convert_text, [row for row in self if not
+                                               (row.startswith("RSID") or
+                                                row.startswith("#") or
+                                                row.startswith("rsid") or
+                                                not row.strip())])
+        # write_file(result)
         return(result)
         ''' ignore lines that are empty, are comments or are headers'''
 
@@ -227,7 +251,10 @@ class SNPArray():
             position = position.replace("number:", '')
             alleles = str(first_sheet.cell(rownum, 3))
             alleles = alleles.replace("text:", '')
-            row = rsid + "\t" + str(chromosome) + "\t" + str(position) + "\t" + alleles
+            row = rsid + "\t"
+            + str(chromosome) + "\t"
+            + str(position)
+            + "\t" + alleles
             row = row.replace("\'", '')
             decoded_file.append(row)
         snps = SNPArray.multiprocess_text(decoded_file)
@@ -239,8 +266,13 @@ class SNPArray():
     def write_file(self):
         print(self.user)
         # print(self.snps)
-        # out_dir_file = arguments.output + "/" + user + "_" + file + "gen" + genome_build + ".txt"
-        out_dir_file = arguments.output + "/" + self.user + "_" + self.opensnp_file_id + "_" + self.vendor + "_" + self.genome + ".txt"
+        # out_dir_file = arguments.output + "/" + user + "_" + file + "gen"
+        # + genome_build + ".txt"
+        out_dir_file = arguments.output + "/"
+        + self.user + "_"
+        + self.opensnp_file_id + "_"
+        + self.vendor + "_"
+        + self.genome + ".txt"
         with open(out_dir_file, 'w') as outfile:
             for row in self.snps:
                 csv_writer = csv.writer(outfile, delimiter="\t")
