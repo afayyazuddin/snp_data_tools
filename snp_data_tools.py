@@ -32,6 +32,10 @@ parser.add_argument("-f", "--format",
                     help="output format, default is 23andMe",
                     default="23andMe",
                     choices=['23andMe', 'bed'])
+parser.add_argument("-id", "--identifier",
+                    help="identifier, default is chromosome_position",
+                    default="chrom_pos",
+                    choices=['chrom_pos', 'rsid'])
 
 # parser.add_argument("-f", "--fasta", help="location of fasta files \
 # default = vcf: VCF")
@@ -45,10 +49,17 @@ with open("genome_build_coords.txt", 'r') as infile:
 # SNP class encodes the genome coordinates and alleles of each
 # variant in the genotype file
 class SNP():
-    def __init__(self, rsid, chromosome, position, allele1, allele2):
+    def __init__(self,
+                 rsid,
+                 chromosome,
+                 position,
+                 chrom_pos,
+                 allele1,
+                 allele2):
         self.rsid = rsid
         self.chromosome = chromosome
         self.position = position
+        self.chrom_pos = chrom_pos
         self.allele1 = allele1
         self.allele2 = allele2
 
@@ -61,6 +72,7 @@ class SNP():
         if chromosome == "23":
             chromosome = "X"
         position = splitrow[2].strip('\"')
+        chrom_pos = chromosome + "_" + position
         splitrow[3] = splitrow[3].strip('\"')
         if len(splitrow) == 5:
             allele1 = splitrow[3]
@@ -73,7 +85,7 @@ class SNP():
                 allele1 = splitrow[3][0]
                 allele2 = ""
         # print(SNP(rsid, chromosome, position, allele1, allele2))
-        return SNP(rsid, chromosome, position, allele1, allele2)
+        return SNP(rsid, chromosome, position, chrom_pos, allele1, allele2)
 
     def __str__(self):
         return "{} at chromosome {} position {} with \
@@ -178,11 +190,17 @@ class SNPArray():
 
     def convert_text(self):
         SNP_row = SNP.convert(self)
-        return (SNP_row.rsid + "\t"
-                + SNP_row.chromosome + "\t"
-                + SNP_row.position
-                + "\t"
-                + SNP_row.allele1 + SNP_row.allele2)
+        if arguments.identifier == "rsid":
+            SNP_to_write = SNP_row.rsid + "\t"
+            + SNP_row.chromosome + "\t"
+            + SNP_row.position + "\t"
+            + SNP_row.allele1 + SNP_row.allele2
+        else:
+            SNP_to_write = SNP_row.chrom_pos + "\t"
+            + SNP_row.chromosome + "\t"
+            + SNP_row.position + "\t"
+            + SNP_row.allele1 + SNP_row.allele2
+        return(SNP_to_write)
 
     def multiprocess_text(self):
         '''global genome_build
